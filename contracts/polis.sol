@@ -42,11 +42,11 @@ contract Polis is Oikos {
         PolisToUnity[_polis_id] = _parent_unity_id;
     }
 
-    function get_oikos_list(uint16 _polis_id, uint16 _n_oikos) public view returns (uint32[] memory) {
+    function get_oikos_list(uint16 _polis_id, uint16 _n_oikos, uint8 min_status, uint8 max_status) public view returns (uint32[] memory) {
         uint32[] memory oikos_list = new uint32[](_n_oikos);
         uint32 counter = 0;
         for (uint32 i=0; i<last_oikos_id; i++) {
-            if (OikosToPolis[i] == _polis_id) {
+            if (OikosToPolis[i] == _polis_id && OikosToStatus[i] >= min_status && OikosToStatus[i] <= max_status) {
                 oikos_list[counter] = i;
                 counter++;
             }
