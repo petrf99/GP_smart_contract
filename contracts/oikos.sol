@@ -1,85 +1,122 @@
-// SPDX-License-Identifier: UNLICENSED
+// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.28;
 
-import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-contract Oikos is ERC721, ERC721URIStorage,  Ownable {
+/// @title Oikos Token 
+/// @notice ERC721 token representing a digital private property unit in a Polis.
+/// @dev Inherits from OpenZeppelin's ERC721URIStorage and Ownable contracts.
+contract Oikos is ERC721URIStorage,  Ownable {
 
-    event OikosStatusChanging(uint256 oikos_id, uint8 old_status, uint8 new_status);
-    event OikosTokenReminting(uint256 oikos_id, address old_owner_address, address new_owner_address);
+    event OikosStatusChanging(uint256 oikosId, uint8 oldStatus, uint8 newStatus);
+    event OikosTokenReminting(uint256 oikosId, address oldOwnerAddress, address newOwnerAddress);
+    event ContractURIUpdated(string newContractURI);
 
-    uint256 last_oikos_id;
+    uint256 nextOikosId;
+    string private _contractURI;
 
-    mapping (uint256 => uint16) OikosToPolis;
+    /// Map to Polis in which Oikos resides.
+    mapping (uint256 => uint16) oikosToPolis;
 
-    // Statuses: 0 - token deactivated, 1 - in property, 2 - is being used, 3 - on sale, 4 - in project
-    uint8 num_statuses = 4;
-    mapping (uint256 => uint8) OikosToStatus; 
+    /// Statuses: 0 - token deactivated, 1 - in property, 2 - is being used, 3 - on sale, 4 - in project.
+    uint8 statusNum = 4;
+    mapping (uint256 => uint8) oikosToStatus; 
 
-    mapping (uint256 => bool) RemintingPermission;
+    /// Permissions on reminting of tokens.
+    mapping (uint256 => bool) private _remintingPermissions;
     
-
-    constructor() ERC721("OikosToken", "OKST") Ownable(msg.sender) {
-        last_oikos_id = 1; 
+    /// @notice Sets _contractURI and first nextOikosId.
+    /// @param _initContractURI Metadata URI for whole contract.
+    constructor(string memory _initContractURI) ERC721("OikosToken", "OKST") Ownable(msg.sender) {
+        _contractURI = _initContractURI;
     }
 
-    // 1. tokenURI override
-    function tokenURI(uint256 tokenId) public view override(ERC721, ERC721URIStorage) returns (string memory) {
-        return super.tokenURI(tokenId);
+    /// @notice Create new Oikos Token.
+    /// @param _to Address of the owner.
+    /// @param _tokenURI Token metadata URI.
+    /// @param _parentPolisId Polis in which Oikos resides.
+    /// @param _status Oikos status: 0 - token deactivated, 1 - in property, 2 - is being used, 3 - on sale, 4 - in project.
+    function createNewOikosToken(address _to, string memory _tokenURI, uint16 _parentPolisId, uint8 _status) public onlyOwner {
+        require(_status > 0 && _status <= statusNum && bytes(_tokenURI).length > 0);
+        _safeMint(_to, nextOikosId); 
+        oikosToStatus[nextOikosId] = _status;
+        oikosToPolis[nextOikosId] = _parentPolisId;
+        _setTokenURI(nextOikosId, _tokenURI);
+        nextOikosId++;  
     }
 
-    // 2. supportsInterface override
-    function supportsInterface(bytes4 interfaceId) public view override(ERC721, ERC721URIStorage) returns (bool) {
-        return super.supportsInterface(interfaceId);
+    /// @notice Change of Oikos Token URI.
+    /// @param _oikosId Id of the Oikos Token.
+    /// @param _tokenURI New metadata URI.
+    /// @dev onlyOwner.
+    function changeOikosTokenURI(uint256 _oikosId, string memory _tokenURI) public onlyOwner {
+        _setTokenURI(_oikosId, _tokenURI);
     }
 
-
-    function create_new_oikos(address _to, string memory _tokenURI, uint16 _parent_polis_id, uint8 _status) public onlyOwner {
-        _safeMint(_to, last_oikos_id); 
-        OikosToStatus[last_oikos_id] = _status;
-        OikosToPolis[last_oikos_id] = _parent_polis_id;
-        _setTokenURI(last_oikos_id, _tokenURI);
-        last_oikos_id++;  
+    /// @notice Get Polis in which Oikos resides.
+    /// @param _oikosId Id of the Oikos Token.
+    /// @return Id of Polis.
+    function getParentPolis(uint256 _oikosId) public view returns (uint16) {
+        return oikosToPolis[_oikosId];
     }
 
-    function change_oikos_token_uri(uint256 _oikos_id, string memory _tokenURI) public onlyOwner {
-        _setTokenURI(_oikos_id, _tokenURI);
+    /// @notice Returns the status of the Oikos token.
+    /// @param _oikosId Id of the Oikos Token.
+    /// @return uint8 Status code.
+    function getOikosStatus(uint256 _oikosId) public view returns (uint8) {
+        return oikosToStatus[_oikosId];
     }
 
-    function get_oikos_token_uri(uint256 _oikos_id) public view returns (string memory) {
-        return (
-            tokenURI(_oikos_id)
-            );
+    /// @notice Set new Oikos Status.
+    /// @param _oikosId Id of the Oikos Token.
+    /// @param _newStatus New Status.
+    /// @dev onlyOwner.
+    function setOikosStatus(uint256 _oikosId, uint8 _newStatus) public onlyOwner {
+        require(oikosToStatus[_oikosId] > 0 && _newStatus <= statusNum);
+        emit OikosStatusChanging(_oikosId, oikosToStatus[_oikosId], _newStatus);
+        oikosToStatus[_oikosId] = _newStatus;
     }
 
-    function get_parent_polis(uint256 _oikos_id) public view returns (uint16) {
-        return OikosToPolis[_oikos_id];
+    /// @notice Set number of different statuses.
+    /// @param _newStatusNum New number of statuses.
+    /// @dev onlyOwner.
+    function setStatusNum(uint8 _newStatusNum) public onlyOwner {
+        statusNum = _newStatusNum;
     }
 
-    function set_oikos_status(uint256 _oikos_id, uint8 _newStatus) public onlyOwner {
-        require(OikosToStatus[_oikos_id] > 0 && _newStatus <= num_statuses);
-        emit OikosStatusChanging(_oikos_id, OikosToStatus[_oikos_id], _newStatus);
-        OikosToStatus[_oikos_id] = _newStatus;
+    /// @notice Grants or revokes permission to remint the token.
+    /// @param _oikosId Id of the Oikos Token.
+    /// @param _perm New bool value of permission (true/false)
+    /// @dev Available only to the owner of token.
+    function setRemintingPermission(uint256 _oikosId, bool _perm) public {
+        require(msg.sender == ownerOf(_oikosId)); /// only owner of oikos can change permissions
+        _remintingPermissions[_oikosId] = _perm;
     }
 
-    function set_num_statuses(uint8 _new_val) public onlyOwner {
-        num_statuses = _new_val;
+    /// @notice Remint (disactivate old and create new) token in case if owner lost access to his account (private key). Can be run only by the owner of the contract.
+    /// @param _oikosId Id of the Oikos Token.
+    /// @param _newOwnerAddress New address of the same real-world owner.
+    /// @dev onlyOwner.
+    function remintOikosToken(uint256 _oikosId, address _newOwnerAddress) public onlyOwner {
+        require(oikosToStatus[_oikosId] != 0, "Token is deactivated");
+        require(_remintingPermissions[_oikosId] == true, "No permission to remint");
+        uint8 act_status = oikosToStatus[_oikosId];
+        emit OikosTokenReminting(_oikosId, ownerOf(_oikosId), _newOwnerAddress);
+        oikosToStatus[_oikosId] = 0; // deactivate token
+        createNewOikosToken(_newOwnerAddress, tokenURI(_oikosId), oikosToPolis[_oikosId], act_status);
     }
 
-    function set_reminting_permission(uint256 _oikos_id, bool _perm) public {
-        require(msg.sender == ownerOf(_oikos_id));
-        RemintingPermission[_oikos_id] = _perm;
+    /// @notice Returns whole contract metadata URI.
+    function contractURI() public view virtual returns (string memory) {
+        return _contractURI;
     }
 
-    // In case if owner lost access to his private key we can "remint" his token
-    function remint_oikos_token(uint256 _oikos_id, address _newOwnerAddress) public onlyOwner {
-        require(OikosToStatus[_oikos_id] > 0 && RemintingPermission[_oikos_id] == true);
-        uint8 act_status = OikosToStatus[_oikos_id];
-        emit OikosTokenReminting(_oikos_id, ownerOf(_oikos_id), _newOwnerAddress);
-        OikosToStatus[_oikos_id] = 0; // deactivate token
-        create_new_oikos(_newOwnerAddress, tokenURI(_oikos_id), OikosToPolis[_oikos_id], act_status);
+    /// @notice Change _contractURI.
+    /// @param _newContractURI New value for _contractURI. 
+    function setContractURI(string memory _newContractURI) public virtual onlyOwner {
+        _contractURI = _newContractURI;
+        emit ContractURIUpdated(_contractURI);
     }
 
 }
