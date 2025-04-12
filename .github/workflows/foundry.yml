@@ -1,0 +1,27 @@
+name: Foundry CI
+
+on:
+  push:
+    branches: [main, foundry]
+  pull_request:
+    branches: [main, foundry]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+
+      - name: Install dependencies
+        run: forge install
+
+      - name: Build contracts
+        run: forge build
+
+      - name: Run tests
+        run: forge test -vv
+
