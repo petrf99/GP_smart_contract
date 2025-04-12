@@ -58,6 +58,7 @@ To run all tests:
 
 ```bash
 forge test -vv
+```
 
 ## 📁 Project Structure
 src/
