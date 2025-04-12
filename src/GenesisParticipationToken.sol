@@ -48,7 +48,7 @@ contract GenesisParticipationToken is ERC721URIStorage, Ownable {
     function createNewGPPT(address _to, string memory _partyNum) public onlyOwner {
         require(bytes(_partyNum).length > 0, "Party number must not be empty");
         _safeMint(_to, nextTokenId);
-        _setTokenURI(nextTokenId, string(abi.encodePacked(_baseTokenURI, Strings.toString(nextTokenId), ".json")));
+        _setTokenURI(nextTokenId, string(abi.encodePacked(Strings.toString(nextTokenId), ".json")));
         tokenToPartyNum[nextTokenId] = _partyNum;
         emit TokenCreated(_to, nextTokenId, _partyNum);
         nextTokenId++;
