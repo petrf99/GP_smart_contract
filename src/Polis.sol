@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.28;
 
-import "./oikos.sol";
+import "src/Oikos.sol";
 
 /// @title Polis Smart Contract
 /// @notice Smart Contract representing Polis as a group of Oikoses.
