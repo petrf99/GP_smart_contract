@@ -3,11 +3,10 @@ pragma solidity ^0.8.28;
 
 import "./oikos.sol";
 
-/// @title Polis Smart Contract 
+/// @title Polis Smart Contract
 /// @notice Smart Contract representing Polis as a group of Oikoses.
 /// @dev Inherits from Oikos contract.
 contract Polis is Oikos {
-
     event NewPolis(uint16 polisId, uint8 parentUnityId);
     event ParentUnityChanging(uint16 polisId, uint8 oldParentUnityId, uint8 newParentUnityId);
 
@@ -17,7 +16,7 @@ contract Polis is Oikos {
     string private _contractURI;
 
     /// Unities of Polises (if exist)
-    mapping (uint16 => uint8) polisToUnity;
+    mapping(uint16 => uint8) polisToUnity;
 
     /// @notice Sets _contractURI.
     /// @param _initContractURI Metadata URI for whole contract.
@@ -32,7 +31,7 @@ contract Polis is Oikos {
     function createNewPolis(uint8 _parentUnityId) public onlyOwner {
         polisToUnity[nextPolisId] = _parentUnityId;
         emit NewPolis(nextPolisId, _parentUnityId);
-        nextPolisId++;  
+        nextPolisId++;
     }
 
     /// @notice Get Unity for given Polis.
@@ -55,7 +54,11 @@ contract Polis is Oikos {
     /// @param _minStatus Minimal status of Oikos to be listed (if needed to filter).
     /// @param _maxStatus Max status of Oikos to be listed (if needed to filter).
     /// @return uint256[] List of Oikoses.
-    function getOikosList(uint16 _polisId, uint16 _nOikos, uint8 _minStatus, uint8 _maxStatus) public view returns (uint256[] memory) {
+    function getOikosList(uint16 _polisId, uint16 _nOikos, uint8 _minStatus, uint8 _maxStatus)
+        public
+        view
+        returns (uint256[] memory)
+    {
         uint256[] memory oikosList = new uint256[](_nOikos);
         uint256 counter = 0;
         for (uint32 i = 0; i < nextOikosId; i++) {
@@ -76,10 +79,9 @@ contract Polis is Oikos {
     }
 
     /// @notice Change _contractURI.
-    /// @param _newContractURI New value for _contractURI. 
+    /// @param _newContractURI New value for _contractURI.
     function setContractURI(string memory _newContractURI) public override onlyOwner {
         _contractURI = _newContractURI;
         emit ContractURIUpdated(_contractURI);
     }
-
 }

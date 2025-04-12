@@ -4,11 +4,10 @@ pragma solidity ^0.8.28;
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-/// @title Oikos Token 
+/// @title Oikos Token
 /// @notice ERC721 token representing a digital private property unit in a Polis.
 /// @dev Inherits from OpenZeppelin's ERC721URIStorage and Ownable contracts.
-contract Oikos is ERC721URIStorage,  Ownable {
-
+contract Oikos is ERC721URIStorage, Ownable {
     event OikosStatusChanging(uint256 oikosId, uint8 oldStatus, uint8 newStatus);
     event OikosTokenReminting(uint256 oikosId, address oldOwnerAddress, address newOwnerAddress);
     event ContractURIUpdated(string newContractURI);
@@ -17,15 +16,15 @@ contract Oikos is ERC721URIStorage,  Ownable {
     string private _contractURI;
 
     /// Map to Polis in which Oikos resides.
-    mapping (uint256 => uint16) oikosToPolis;
+    mapping(uint256 => uint16) oikosToPolis;
 
     /// Statuses: 0 - token deactivated, 1 - in property, 2 - is being used, 3 - on sale, 4 - in project.
     uint8 statusNum = 4;
-    mapping (uint256 => uint8) oikosToStatus; 
+    mapping(uint256 => uint8) oikosToStatus;
 
     /// Permissions on reminting of tokens.
-    mapping (uint256 => bool) private _remintingPermissions;
-    
+    mapping(uint256 => bool) private _remintingPermissions;
+
     /// @notice Sets _contractURI and first nextOikosId.
     /// @param _initContractURI Metadata URI for whole contract.
     constructor(string memory _initContractURI) ERC721("OikosToken", "OKST") Ownable(msg.sender) {
@@ -37,13 +36,16 @@ contract Oikos is ERC721URIStorage,  Ownable {
     /// @param _tokenURI Token metadata URI.
     /// @param _parentPolisId Polis in which Oikos resides.
     /// @param _status Oikos status: 0 - token deactivated, 1 - in property, 2 - is being used, 3 - on sale, 4 - in project.
-    function createNewOikosToken(address _to, string memory _tokenURI, uint16 _parentPolisId, uint8 _status) public onlyOwner {
+    function createNewOikosToken(address _to, string memory _tokenURI, uint16 _parentPolisId, uint8 _status)
+        public
+        onlyOwner
+    {
         require(_status > 0 && _status <= statusNum && bytes(_tokenURI).length > 0);
-        _safeMint(_to, nextOikosId); 
+        _safeMint(_to, nextOikosId);
         oikosToStatus[nextOikosId] = _status;
         oikosToPolis[nextOikosId] = _parentPolisId;
         _setTokenURI(nextOikosId, _tokenURI);
-        nextOikosId++;  
+        nextOikosId++;
     }
 
     /// @notice Change of Oikos Token URI.
@@ -90,7 +92,8 @@ contract Oikos is ERC721URIStorage,  Ownable {
     /// @param _perm New bool value of permission (true/false)
     /// @dev Available only to the owner of token.
     function setRemintingPermission(uint256 _oikosId, bool _perm) public {
-        require(msg.sender == ownerOf(_oikosId)); /// only owner of oikos can change permissions
+        require(msg.sender == ownerOf(_oikosId));
+        /// only owner of oikos can change permissions
         _remintingPermissions[_oikosId] = _perm;
     }
 
@@ -113,10 +116,9 @@ contract Oikos is ERC721URIStorage,  Ownable {
     }
 
     /// @notice Change _contractURI.
-    /// @param _newContractURI New value for _contractURI. 
+    /// @param _newContractURI New value for _contractURI.
     function setContractURI(string memory _newContractURI) public virtual onlyOwner {
         _contractURI = _newContractURI;
         emit ContractURIUpdated(_contractURI);
     }
-
 }
