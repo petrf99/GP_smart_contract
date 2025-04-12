@@ -2,7 +2,7 @@
 pragma solidity ^0.8.20;
 
 import "forge-std/Test.sol";
-import "../src/Oikos.sol";
+import "src/Oikos.sol";
 
 /// @title OikosToken Unit Tests
 /// @notice Full test suite for the Oikos contract.
