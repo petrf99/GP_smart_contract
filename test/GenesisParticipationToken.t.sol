@@ -2,7 +2,7 @@
 pragma solidity ^0.8.20;
 
 import "forge-std/Test.sol";
-import "../src/GenesisParticipationToken.sol";
+import "src/GenesisParticipationToken.sol";
 
 /// @title GenesisParticipationToken Unit Tests
 /// @notice Complete test suite for the GenesisParticipationToken smart contract.

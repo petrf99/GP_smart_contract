@@ -1,21 +1,27 @@
+# Node & JS dependencies
 node_modules
 .env
 
-# Hardhat files
+# Hardhat artifacts & cache
 /cache
 /artifacts
-
-# TypeChain files
-/typechain
-/typechain-types
-
-# solidity-coverage files
 /coverage
 /coverage.json
 
-# Hardhat Ignition default folder for deployments against a local node
+# TypeChain
+/typechain
+/typechain-types
+
+# Hardhat Ignition (local-only)
 ignition/deployments/chain-31337
 
-# VSCode
-/.vscode
+# VSCode project settings
+.vscode/
+
+# Foundry build output
 out/
+cache/
+
+# Other
+*.tsbuildinfo
+*.log
