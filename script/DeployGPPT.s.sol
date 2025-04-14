@@ -9,14 +9,14 @@ import "src/GenesisParticipationToken.sol";
 contract DeployGenesis is Script {
     function run() external {
         string memory baseURI = "ipfs://bafybeifray3lprk45rtvcsfzv3jw2kdsdtfdhnnww2mfweq665mliuofsu/";
-        string memory contractURI = "ipfs://bafybeifray3lprk45rtvcsfzv3jw2kdsdtfdhnnww2mfweq665mliuofsu/GPPT_contract_metadata_test.json";
+        string memory contractURI =
+            "ipfs://bafybeifray3lprk45rtvcsfzv3jw2kdsdtfdhnnww2mfweq665mliuofsu/GPPT_contract_metadata_test.json";
 
-
-        vm.startBroadcast(); 
+        vm.startBroadcast();
 
         GenesisParticipationToken token = new GenesisParticipationToken(baseURI, contractURI);
 
-        vm.stopBroadcast(); 
+        vm.stopBroadcast();
 
         console.log("GenesisParticipationToken deployed at:", address(token));
     }
