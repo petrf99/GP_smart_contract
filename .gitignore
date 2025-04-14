@@ -25,3 +25,6 @@ cache/
 # Other
 *.tsbuildinfo
 *.log
+test_metadata/
+test_images/
+testnet_calls/

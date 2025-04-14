@@ -57,13 +57,18 @@ contract GenesisParticipationToken is ERC721URIStorage, Ownable {
     /// @notice Returns the real-world participant number associated with the given token ID.
     /// @param _tokenId token ID.
     /// @return The participant number as a string.
-    function getPartyNum(uint256 _tokenId) public view returns (string memory) {
+    function getPartyNum(uint256 _tokenId) public view onlyOwner returns (string memory) {
         require(_tokenId >= 0 && _tokenId < nextTokenId, "Token does not exist");
         return tokenToPartyNum[_tokenId];
     }
 
+    /// @notice Returns current nextTokenId
+    function getNextTokenId() public view onlyOwner returns (uint256) {
+        return nextTokenId;
+    }
+
     /// @notice Returns whole contract metadata URI.
-    function contractURI() public view returns (string memory) {
+    function contractURI() public view onlyOwner returns (string memory) {
         return _contractURI;
     }
 
