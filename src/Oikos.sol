@@ -10,7 +10,6 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 contract Oikos is ERC721URIStorage, Ownable {
     event OikosStatusChanging(uint256 oikosId, uint8 oldStatus, uint8 newStatus);
     event OikosTokenReminting(uint256 oikosId, address oldOwnerAddress, address newOwnerAddress);
-    event ContractURIUpdated(string newContractURI);
 
     uint256 nextOikosId;
     string private _contractURI;
@@ -25,10 +24,9 @@ contract Oikos is ERC721URIStorage, Ownable {
     /// Permissions on reminting of tokens.
     mapping(uint256 => bool) private _remintingPermissions;
 
-    /// @notice Sets _contractURI and first nextOikosId.
-    /// @param _initContractURI Metadata URI for whole contract.
-    constructor(string memory _initContractURI) ERC721("OikosToken", "OKST") Ownable(msg.sender) {
-        _contractURI = _initContractURI;
+    /// @notice Sets token name and contract owner.
+    constructor() ERC721("OikosToken", "OKST") Ownable(msg.sender) {
+        //
     }
 
     /// @notice Create new Oikos Token.
@@ -36,10 +34,7 @@ contract Oikos is ERC721URIStorage, Ownable {
     /// @param _tokenURI Token metadata URI.
     /// @param _parentPolisId Polis in which Oikos resides.
     /// @param _status Oikos status: 0 - token deactivated, 1 - in property, 2 - is being used, 3 - on sale, 4 - in project.
-    function createNewOikosToken(address _to, string memory _tokenURI, uint16 _parentPolisId, uint8 _status)
-        public
-        onlyOwner
-    {
+    function mintNewOikosToken(address _to, string memory _tokenURI, uint16 _parentPolisId, uint8 _status) internal {
         require(_status > 0 && _status <= statusNum && bytes(_tokenURI).length > 0);
         _safeMint(_to, nextOikosId);
         oikosToStatus[nextOikosId] = _status;
@@ -107,18 +102,6 @@ contract Oikos is ERC721URIStorage, Ownable {
         uint8 act_status = oikosToStatus[_oikosId];
         emit OikosTokenReminting(_oikosId, ownerOf(_oikosId), _newOwnerAddress);
         oikosToStatus[_oikosId] = 0; // deactivate token
-        createNewOikosToken(_newOwnerAddress, tokenURI(_oikosId), oikosToPolis[_oikosId], act_status);
-    }
-
-    /// @notice Returns whole contract metadata URI.
-    function contractURI() public view virtual returns (string memory) {
-        return _contractURI;
-    }
-
-    /// @notice Change _contractURI.
-    /// @param _newContractURI New value for _contractURI.
-    function setContractURI(string memory _newContractURI) public virtual onlyOwner {
-        _contractURI = _newContractURI;
-        emit ContractURIUpdated(_contractURI);
+        mintNewOikosToken(_newOwnerAddress, tokenURI(_oikosId), oikosToPolis[_oikosId], act_status);
     }
 }

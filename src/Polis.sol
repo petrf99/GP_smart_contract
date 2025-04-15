@@ -7,12 +7,12 @@ import "src/Oikos.sol";
 /// @notice Smart Contract representing Polis as a group of Oikoses.
 /// @dev Inherits from Oikos contract.
 contract Polis is Oikos {
-    event NewPolis(uint16 polisId, uint8 parentUnityId);
+    event NewPolisCreated(uint16 polisId, uint8 parentUnityId);
     event ParentUnityChanging(uint16 polisId, uint8 oldParentUnityId, uint8 newParentUnityId);
+    event ContractURIUpdated(string newContractURI);
 
     uint16 public nextPolisId;
 
-    /// @dev Polis-specific metadata URI, separate from parent Oikos contract.
     string private _contractURI;
 
     /// Unities of Polises (if exist)
@@ -21,7 +21,7 @@ contract Polis is Oikos {
     /// @notice Sets _contractURI.
     /// @param _initContractURI Metadata URI for whole contract.
     /// @dev Overrides parent contract URI with Polis-specific metadata.
-    constructor(string memory _initContractURI) Oikos(_initContractURI) {
+    constructor(string memory _initContractURI) Oikos() {
         _contractURI = _initContractURI;
     }
 
@@ -30,8 +30,16 @@ contract Polis is Oikos {
     /// @dev onlyOwner.
     function createNewPolis(uint8 _parentUnityId) public onlyOwner {
         polisToUnity[nextPolisId] = _parentUnityId;
-        emit NewPolis(nextPolisId, _parentUnityId);
+        emit NewPolisCreated(nextPolisId, _parentUnityId);
         nextPolisId++;
+    }
+
+    function createNewOikosToken(address _to, string memory _tokenURI, uint16 _parentPolisId, uint8 _status)
+        public
+        onlyOwner
+    {
+        require(nextPolisId > 0);
+        mintNewOikosToken(_to, _tokenURI, _parentPolisId, _status);
     }
 
     /// @notice Get Unity for given Polis.
@@ -74,13 +82,13 @@ contract Polis is Oikos {
     }
 
     /// @notice Returns whole contract metadata URI.
-    function contractURI() public view override returns (string memory) {
+    function contractURI() public view returns (string memory) {
         return _contractURI;
     }
 
     /// @notice Change _contractURI.
     /// @param _newContractURI New value for _contractURI.
-    function setContractURI(string memory _newContractURI) public override onlyOwner {
+    function setContractURI(string memory _newContractURI) public onlyOwner {
         _contractURI = _newContractURI;
         emit ContractURIUpdated(_contractURI);
     }
