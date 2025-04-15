@@ -38,6 +38,7 @@ contract GenesisParticipationToken is ERC721URIStorage, Ownable {
     /// @param _newBaseURI New base URI.
     function setBaseURI(string memory _newBaseURI) public onlyOwner {
         require(nextTokenId == 0, "Too late to change baseURI, tokens have been minted.");
+        require(bytes(_newBaseURI).length > 0, "Invalid _newBaseURI value.");
         _baseTokenURI = _newBaseURI;
         emit BaseURIUpdated(_baseTokenURI);
     }
@@ -46,6 +47,7 @@ contract GenesisParticipationToken is ERC721URIStorage, Ownable {
     /// @param _to Receiver of token.
     /// @param _partyNum Real-world participant identifier.
     function createNewGPPT(address _to, string memory _partyNum) public onlyOwner {
+        require(_to != address(0), "Invalid _to value.");
         require(bytes(_partyNum).length > 0, "Party number must not be empty");
         _safeMint(_to, nextTokenId);
         _setTokenURI(nextTokenId, string(abi.encodePacked(Strings.toString(nextTokenId), ".json")));
@@ -58,7 +60,7 @@ contract GenesisParticipationToken is ERC721URIStorage, Ownable {
     /// @param _tokenId token ID.
     /// @return The participant number as a string.
     function getPartyNum(uint256 _tokenId) public view onlyOwner returns (string memory) {
-        require(_tokenId >= 0 && _tokenId < nextTokenId, "Token does not exist");
+        require(_tokenId < nextTokenId, "Token does not exist");
         return tokenToPartyNum[_tokenId];
     }
 
@@ -75,6 +77,7 @@ contract GenesisParticipationToken is ERC721URIStorage, Ownable {
     /// @notice Change _contractURI.
     /// @param _newContractURI New value for _contractURI.
     function setContractURI(string memory _newContractURI) public onlyOwner {
+        require(bytes(_newContractURI).length > 0, "Invalid _newContractURI value.");
         _contractURI = _newContractURI;
         emit ContractURIUpdated(_contractURI);
     }

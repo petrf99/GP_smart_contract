@@ -24,10 +24,16 @@ contract GenesisTest is Test {
 
     /// @notice Tests that the owner can mint a token with valid data.
     /// @dev Checks owner assignment and party number association.
-    function testOwnerCanMint() public {
+    function testOwnerCanMintAndRead() public {
         token.createNewGPPT(user, "INV-001");
         assertEq(token.ownerOf(0), user);
         assertEq(token.getPartyNum(0), "INV-001");
+    }
+
+    /// @notice Tests revert on invalid _to.
+    function test_Revert_OnNullAddressWhenMinting() public {
+        vm.expectRevert("Invalid _to value.");
+        token.createNewGPPT(address(0), "INV-001");
     }
 
     /// @notice Tests that the TokenCreated event is emitted on mint.
@@ -70,6 +76,18 @@ contract GenesisTest is Test {
         vm.prank(user);
         vm.expectRevert(abi.encodeWithSignature("OwnableUnauthorizedAccount(address)", user));
         token.setBaseURI("ipfs://malicious-change/");
+    }
+
+    /// @notice Tests revert on emply _newBaseURI.
+    function test_Revert_OnEmptyBaseURI() public {
+        vm.expectRevert("Invalid _newBaseURI value.");
+        token.setBaseURI("");
+    }
+
+    /// @notice Tests revert on emply _newContractURI.
+    function test_Revert_OnEmptyContractURI() public {
+        vm.expectRevert("Invalid _newContractURI value.");
+        token.setContractURI("");
     }
 
     /// @notice Tests that only the contract owner can change contract URI.

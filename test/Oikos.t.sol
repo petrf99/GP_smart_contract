@@ -29,12 +29,26 @@ contract OikosTest is Test {
         assertEq(testable.ownerOf(0), user1);
         assertEq(testable.getParentPolis(0), 101);
         assertEq(testable.getOikosStatus(0), 3);
+
+        vm.expectRevert("Invalid _oikosId.");
+        testable.getOikosStatus(99);
+    }
+
+    /// @notice Test revert on getParentPolis for nonexisting token.
+    function test_Revert_getParentPolis() public {
+        TestableOikos testable = new TestableOikos();
+
+        vm.expectRevert("Invalid _oikosId.");
+        testable.getParentPolis(99);
     }
 
     /// @notice Tests that status updates work and emit the correct event.
     function testSetStatusWithEvent() public {
         TestableOikos testable = new TestableOikos();
         testable.mint(user1, "ipfs://a.json", 1, 1);
+
+        vm.expectRevert("Invalid _oikosId.");
+        testable.setOikosStatus(99, 2);
 
         vm.expectEmit(true, false, false, true);
         emit OikosStatusChanging(0, 1, 2);
@@ -85,8 +99,11 @@ contract OikosTest is Test {
         TestableOikos testable = new TestableOikos();
         testable.mint(user1, "ipfs://fail.json", 123, 1);
 
-        vm.expectRevert("No permission to remint");
+        vm.expectRevert("No permission to remint.");
         testable.remintOikosToken(0, user2);
+
+        vm.expectRevert("Invalid _oikosId.");
+        testable.remintOikosToken(99, user1);
     }
 
     /// @notice Tests overwriting remint permission and ensuring enforcement.
@@ -100,8 +117,24 @@ contract OikosTest is Test {
         vm.prank(user1);
         testable.setRemintingPermission(0, false);
 
-        vm.expectRevert("No permission to remint");
+        vm.expectRevert("No permission to remint.");
         testable.remintOikosToken(0, user2);
+
+        vm.expectRevert("Invalid _oikosId.");
+        testable.setRemintingPermission(99, false);
+    }
+
+    /// @notice Tests changeOikosTokenURI reverts.
+    function test_Revert_changeOikosTokenURI() public  {
+        TestableOikos testable = new TestableOikos();
+
+        vm.expectRevert("Invalid _oikosId.");
+        testable.changeOikosTokenURI(99, "ipfs://abc/turi.json");
+
+        testable.mint(user1, "ipfs://1.json", 1, 2);
+
+        vm.expectRevert("Invalid _tokenURI value.");
+        testable.changeOikosTokenURI(0, "");
     }
 }
 

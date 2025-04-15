@@ -38,13 +38,16 @@ contract Polis is Oikos {
         public
         onlyOwner
     {
-        require(nextPolisId > 0);
+        require(_status > 0 && _status <= statusNum, "Can't create new Oikos. Invalid _status value.");
+        require(bytes(_tokenURI).length > 0, "Can't create new Oikos. Invalid _tokenURI value.");
+        require(_parentPolisId < nextPolisId, "Can't create new Oikos. Invalid _parentPolisId value.");
         mintNewOikosToken(_to, _tokenURI, _parentPolisId, _status);
     }
 
     /// @notice Get Unity for given Polis.
     /// @param _polisId Id of the Polis.
     function getParentUnity(uint16 _polisId) public view returns (uint8) {
+        require(_polisId < nextPolisId, "Invalid _polisId.");
         return polisToUnity[_polisId];
     }
 
@@ -52,6 +55,7 @@ contract Polis is Oikos {
     /// @param _polisId Id of the Polis.
     /// @param _parentUnityId New Unity Id.
     function setParentUnity(uint16 _polisId, uint8 _parentUnityId) public onlyOwner {
+        require(_polisId < nextPolisId, "Invalid _polisId.");
         emit ParentUnityChanging(_polisId, polisToUnity[_polisId], _parentUnityId);
         polisToUnity[_polisId] = _parentUnityId;
     }
@@ -67,6 +71,8 @@ contract Polis is Oikos {
         view
         returns (uint256[] memory)
     {
+        require(_polisId < nextPolisId, "Invalid _polisId.");
+        require(_maxStatus <= statusNum && _minStatus <= _maxStatus, "Invalid _minStatus, _maxStatus.");
         uint256[] memory oikosList = new uint256[](_nOikos);
         uint256 counter = 0;
         for (uint32 i = 0; i < nextOikosId; i++) {
@@ -89,6 +95,7 @@ contract Polis is Oikos {
     /// @notice Change _contractURI.
     /// @param _newContractURI New value for _contractURI.
     function setContractURI(string memory _newContractURI) public onlyOwner {
+        require(bytes(_newContractURI).length > 0, "Invalid _newContractURI value.");
         _contractURI = _newContractURI;
         emit ContractURIUpdated(_contractURI);
     }

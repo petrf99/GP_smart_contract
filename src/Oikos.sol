@@ -35,7 +35,6 @@ contract Oikos is ERC721URIStorage, Ownable {
     /// @param _parentPolisId Polis in which Oikos resides.
     /// @param _status Oikos status: 0 - token deactivated, 1 - in property, 2 - is being used, 3 - on sale, 4 - in project.
     function mintNewOikosToken(address _to, string memory _tokenURI, uint16 _parentPolisId, uint8 _status) internal {
-        require(_status > 0 && _status <= statusNum && bytes(_tokenURI).length > 0);
         _safeMint(_to, nextOikosId);
         oikosToStatus[nextOikosId] = _status;
         oikosToPolis[nextOikosId] = _parentPolisId;
@@ -48,6 +47,8 @@ contract Oikos is ERC721URIStorage, Ownable {
     /// @param _tokenURI New metadata URI.
     /// @dev onlyOwner.
     function changeOikosTokenURI(uint256 _oikosId, string memory _tokenURI) public onlyOwner {
+        require(_oikosId < nextOikosId, "Invalid _oikosId.");
+        require(bytes(_tokenURI).length > 0, "Invalid _tokenURI value.");
         _setTokenURI(_oikosId, _tokenURI);
     }
 
@@ -55,6 +56,7 @@ contract Oikos is ERC721URIStorage, Ownable {
     /// @param _oikosId Id of the Oikos Token.
     /// @return Id of Polis.
     function getParentPolis(uint256 _oikosId) public view returns (uint16) {
+        require(_oikosId < nextOikosId, "Invalid _oikosId.");
         return oikosToPolis[_oikosId];
     }
 
@@ -62,6 +64,7 @@ contract Oikos is ERC721URIStorage, Ownable {
     /// @param _oikosId Id of the Oikos Token.
     /// @return uint8 Status code.
     function getOikosStatus(uint256 _oikosId) public view returns (uint8) {
+        require(_oikosId < nextOikosId, "Invalid _oikosId.");
         return oikosToStatus[_oikosId];
     }
 
@@ -70,7 +73,8 @@ contract Oikos is ERC721URIStorage, Ownable {
     /// @param _newStatus New Status.
     /// @dev onlyOwner.
     function setOikosStatus(uint256 _oikosId, uint8 _newStatus) public onlyOwner {
-        require(oikosToStatus[_oikosId] > 0 && _newStatus <= statusNum);
+        require(_oikosId < nextOikosId, "Invalid _oikosId.");
+        require(oikosToStatus[_oikosId] > 0 && _newStatus <= statusNum, "Invalid _newStatus value.");
         emit OikosStatusChanging(_oikosId, oikosToStatus[_oikosId], _newStatus);
         oikosToStatus[_oikosId] = _newStatus;
     }
@@ -87,7 +91,8 @@ contract Oikos is ERC721URIStorage, Ownable {
     /// @param _perm New bool value of permission (true/false)
     /// @dev Available only to the owner of token.
     function setRemintingPermission(uint256 _oikosId, bool _perm) public {
-        require(msg.sender == ownerOf(_oikosId));
+        require(_oikosId < nextOikosId, "Invalid _oikosId.");
+        require(msg.sender == ownerOf(_oikosId), "Only available for the owner of the token.");
         /// only owner of oikos can change permissions
         _remintingPermissions[_oikosId] = _perm;
     }
@@ -97,8 +102,10 @@ contract Oikos is ERC721URIStorage, Ownable {
     /// @param _newOwnerAddress New address of the same real-world owner.
     /// @dev onlyOwner.
     function remintOikosToken(uint256 _oikosId, address _newOwnerAddress) public onlyOwner {
-        require(oikosToStatus[_oikosId] != 0, "Token is deactivated");
-        require(_remintingPermissions[_oikosId] == true, "No permission to remint");
+        require(_oikosId < nextOikosId, "Invalid _oikosId.");
+        require(_newOwnerAddress != address(0), "Invalid _newOwnerAddress value.");
+        require(oikosToStatus[_oikosId] != 0, "Token is deactivated.");
+        require(_remintingPermissions[_oikosId] == true, "No permission to remint.");
         uint8 act_status = oikosToStatus[_oikosId];
         emit OikosTokenReminting(_oikosId, ownerOf(_oikosId), _newOwnerAddress);
         oikosToStatus[_oikosId] = 0; // deactivate token
