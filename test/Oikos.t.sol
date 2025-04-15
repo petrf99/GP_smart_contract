@@ -125,7 +125,7 @@ contract OikosTest is Test {
     }
 
     /// @notice Tests changeOikosTokenURI reverts.
-    function test_Revert_changeOikosTokenURI() public  {
+    function test_Revert_changeOikosTokenURI() public {
         TestableOikos testable = new TestableOikos();
 
         vm.expectRevert("Invalid _oikosId.");
