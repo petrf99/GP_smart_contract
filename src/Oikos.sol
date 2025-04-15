@@ -12,7 +12,6 @@ contract Oikos is ERC721URIStorage, Ownable {
     event OikosTokenReminting(uint256 oikosId, address oldOwnerAddress, address newOwnerAddress);
 
     uint256 nextOikosId;
-    string private _contractURI;
 
     /// Map to Polis in which Oikos resides.
     mapping(uint256 => uint16) oikosToPolis;
