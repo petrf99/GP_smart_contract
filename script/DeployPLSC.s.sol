@@ -4,8 +4,8 @@ pragma solidity ^0.8.20;
 import "forge-std/Script.sol";
 import "src/Polis.sol";
 
-/// @title DeployGenesis
-/// @notice Foundry deployment script for GenesisParticipationToken to Sepolia testnet.
+/// @title DeployPolis
+/// @notice Foundry deployment script for Polis Contract to Sepolia testnet.
 contract DeployPolis is Script {
     function run() external {
         string memory contractURI = "";
@@ -16,6 +16,6 @@ contract DeployPolis is Script {
 
         vm.stopBroadcast();
 
-        console.log("GenesisParticipationToken deployed at:", address(cntrct));
+        console.log("PolisContract deployed at:", address(cntrct));
     }
 }
