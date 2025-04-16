@@ -51,6 +51,11 @@ contract Oikos is ERC721URIStorage, Ownable {
         _setTokenURI(_oikosId, _tokenURI);
     }
 
+    /// @notice Getter for nextOikosId.
+    function getNextOikosId() public view returns (uint256) {
+        return nextOikosId;
+    }
+
     /// @notice Get Polis in which Oikos resides.
     /// @param _oikosId Id of the Oikos Token.
     /// @return Id of Polis.
