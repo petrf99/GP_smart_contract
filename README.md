@@ -1,66 +1,80 @@
 # 🌱 Genesis Polis Smart Contracts
 
-**Genesis Polis** is a foundational smart contract suite for Polis's digital management system and participation in an experimental community project.
+**Genesis Polis** is a foundational suite of smart contracts for digital property management, community participation, and urban governance within an experimental system called *Polis*.
 
-These contracts are written in Solidity, fully tested with Foundry, and ready for deployment to testnets or mainnet.
+These contracts are written in **Solidity**, thoroughly tested using **Foundry**, and ready for deployment to testnets or mainnet.
 
 ---
 
 ## 🏗️ Architecture
 
-This system acts as a legal-structural backbone for digital governance of property, participation, and identity within a decentralized urban ecosystem.
+This system acts as a legal-structural backbone for digital governance of property, participation, and identity in a self-governed urban ecosystem.
 
-### 1. `GenesisParticipationToken.sol`
-
-- Type: ERC721
-- Purpose: **Marker of participation** in the Genesis project
-- Each participant receives a token representing their involvement
-- Every token is linked to a `partyNumber` (off-chain participant identifier)
-- Used to initiate off-chain agreements with holders
-
-### 2. `Oikos.sol`
-
-- Type: ERC721
-- Purpose: **Private digital property unit** (an “Oikos”) within a Polis
-- Represents a land plot or house owned by an address (individual or entity)
-- Each Oikos is linked to a `Polis`
-- Includes status logic (`in property`, `on sale`, `in project`, etc.)
-- Owners can authorize "reminting" (token recovery) if access is lost
-
-### 3. `Polis.sol`
-
-- Inherits from `Oikos`
-- Purpose: **Digital representation of a Polis (city)**
-- Manages a group of Oikos tokens
-- Each Polis can optionally belong to a broader `Unity` (future use)
-- Supports filtering Oikos by status and parent relationships
+A *Polis* consists of several *Oikoses*, each representing a living unit (e.g., land plot or house) for one family or entity.
 
 ---
 
-## 🛠️ Technologies
+### 🔹 `GenesisParticipationToken.sol`
 
-- Solidity `^0.8.20`
-- [Foundry](https://book.getfoundry.sh/) for testing and deployment
-- [OpenZeppelin Contracts](https://github.com/OpenZeppelin/openzeppelin-contracts) for secure ERC standards
+- **Type**: ERC721
+- **Purpose**: Represents **participation** in the Genesis project
+- Each token corresponds to a unique participant
+- Linked to a `partyNumber` (an off-chain identifier)
+- Used to initiate real-world agreements with holders
+
+---
+
+### 🔹 `Oikos.sol`
+
+- **Type**: ERC721
+- **Purpose**: Represents a **digital private property unit** (*Oikos*) within a Polis
+- Each token is tied to a specific *Polis*
+- Includes detailed status logic: `in property`, `on sale`, `in project`, etc.
+- Owners can authorize **token reminting** in case of lost access (recovery feature)
+
+---
+
+### 🔹 `Polis.sol`
+
+- **Inherits from**: `Oikos`
+- **Purpose**: Represents a **Polis (city)** as a collection of Oikoses
+- Manages grouped Oikos tokens with parent-child relationships
+- Supports **filtering** Oikoses by status and Polis ID
+- Each Polis can optionally belong to a higher-level `Unity` (future extension)
+
+---
+
+## 🛠️ Tech Stack
+
+- **Solidity** `^0.8.20`
+- **Foundry** – for testing, scripting, and deployment  
+  [→ Foundry Docs](https://book.getfoundry.sh/)
+- **OpenZeppelin** – audited ERC implementations  
+  [→ OpenZeppelin Contracts](https://github.com/OpenZeppelin/openzeppelin-contracts)
 
 ---
 
 ## ✅ Testing
 
-This project includes **35+ unit tests** covering:
+Includes **40+ unit tests** covering:
 
-- Token minting, metadata handling, and status logic
-- Ownership and permission checks (`onlyOwner`)
+- Token minting & metadata
+- Ownership logic (`onlyOwner`)
+- Status management
 - Event emission
-- Edge cases and reverts for invalid input
+- Validation & reverts
 
-To run all tests:
+🧪 To run all tests:
 
 ```bash
 forge test -vv
 ```
 
+---
+
 ## 📁 Project Structure
+
+```
 src/
   ├─ GenesisParticipationToken.sol
   ├─ Oikos.sol
@@ -71,8 +85,21 @@ test/
   ├─ OikosTest.t.sol
   └─ PolisTest.t.sol
 
+script/scenarios_of_use/
+  └─ Real-world interaction scripts
+```
+
+---
+
+## 🧚 Examples
+
+You can explore the `script/scenarios_of_use` folder for practical scripts that simulate real-world usage of the contracts — including minting, transferring, and filtering tokens.
+
+---
+
 ## 👥 Contact
 
-This project is maintained by the Genesis team.  
-For inquiries, collaboration, or technical support, please reach out at:  
-p.k.filimonov@gmail.com 
+Maintained by the **Genesis Team**.
+
+📩 For questions, collaborations, or technical support:  
+**p.k.filimonov@gmail.com**
